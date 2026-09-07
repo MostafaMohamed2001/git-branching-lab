@@ -1,7 +1,7 @@
 import http from 'node:http'
 import { handleRequest } from './app.js'
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 9000
 
 const server = http.createServer(handleRequest)
 
