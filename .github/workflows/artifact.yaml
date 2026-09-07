@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - development
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'Dockerfile'
 
 jobs:
   build:

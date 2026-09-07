@@ -22,6 +22,11 @@ export function handleRequest(req, res) {
     res.end(JSON.stringify({ status: 'ok' }))
     return
   }
+  if (req.method === 'GET' && url.pathname === '/aritfact') {
+    res.writeHead(200)
+    res.end(JSON.stringify({ status: 'ok' }))
+    return
+  }
   res.writeHead(404)
   res.end(JSON.stringify({ error: 'not found' }))
 }
