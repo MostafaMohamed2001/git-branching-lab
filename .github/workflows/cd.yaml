@@ -1,0 +1,68 @@
+name: DEPLOY TO EC2 TO DEV ENV
+
+on:
+  workflow_run:
+    workflows:
+      - Artifact
+    types:
+      - completed
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::114522856449:role/github-actions-ssm-deploy
+          aws-region: eu-central-1
+
+      - name: Deploy to EC2 with SSM
+        run: |
+          aws ssm send-command \
+            --instance-ids "i-079cfe2d35bb85b7b" \
+            --document-name "AWS-RunShellScript" \
+            --parameters 'commands=[
+              "docker pull mostafa1006/git-branching-lab:${{ github.event.workflow_run.head_sha }}",
+              "docker stop node-app || true",
+              "docker rm node-app || true",
+              "docker run -d --name node-app -p 9000:9000 mostafa1006/git-branching-lab:${{ github.event.workflow_run.head_sha }}"
+            ]'
+
+# name: DEPLOY TO EC2 TO DEV ENV
+
+# on:
+#   workflow_run:
+#     workflows:
+#       - Artifact
+#     types:
+#       - completed
+
+# jobs:
+#   deploy:
+#     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Deploy to EC2
+#         uses: appleboy/ssh-action@v1
+#         with:
+#           host: ${{ secrets.EC2_HOST }}
+#           username: ec2-user
+#           key: ${{ secrets.EC2_SSH_KEY }}
+#           script: |
+#             docker pull mostafa1006/git-branching-lab:${{ github.event.workflow_run.head_sha }}
+
+#             docker stop node-app || true
+#             docker rm node-app || true
+
+#             docker run -d \
+#               --name node-app \
+#               -p 9000:9000 \
+#               mostafa1006/git-branching-lab:${{ github.event.workflow_run.head_sha }}
