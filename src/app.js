@@ -15,6 +15,13 @@ export function handleRequest(req, res) {
     return
   }
 
+
+
+  if (req.method === 'GET' && url.pathname === '/payment') {
+    res.writeHead(200)
+    res.end(JSON.stringify({ status: 'ok' }))
+    return
+  }
   res.writeHead(404)
   res.end(JSON.stringify({ error: 'not found' }))
 }
